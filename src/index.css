@@ -1,0 +1,164 @@
+@import url("https://fonts.cdnfonts.com/css/satoshi");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f5f7fd;
+  --foreground: #1c2434;
+  --muted: #eef3fb;
+  --muted-foreground: #64748b;
+  --card: rgba(255, 255, 255, 0.96);
+  --card-foreground: #1c2434;
+  --border: rgba(28, 36, 52, 0.09);
+  --input: rgba(28, 36, 52, 0.14);
+  --primary: #5750f1;
+  --primary-foreground: #ffffff;
+  --secondary: #f0f4ff;
+  --secondary-foreground: #1c2434;
+  --accent: #ede9fe;
+  --accent-foreground: #4338ca;
+  --ring: rgba(87, 80, 241, 0.28);
+  --radius: 0.5rem;
+  --sidebar-background: rgba(255, 255, 255, 0.94);
+  --sidebar-foreground: #1c2434;
+  --sidebar-accent: rgba(87, 80, 241, 0.1);
+  --sidebar-accent-foreground: #4338ca;
+}
+
+.dark {
+  --background: #020d1a;
+  --foreground: #dfe7f5;
+  --muted: #0b1526;
+  --muted-foreground: #94a3b8;
+  --card: rgba(10, 19, 34, 0.96);
+  --card-foreground: #eef4ff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --primary: #6c63ff;
+  --primary-foreground: #ffffff;
+  --secondary: #0e1a30;
+  --secondary-foreground: #e2e8f0;
+  --accent: rgba(108, 99, 255, 0.16);
+  --accent-foreground: #c7c4ff;
+  --ring: rgba(108, 99, 255, 0.35);
+  --sidebar-background: rgba(6, 15, 28, 0.98);
+  --sidebar-foreground: #dfe7f5;
+  --sidebar-accent: rgba(108, 99, 255, 0.14);
+  --sidebar-accent-foreground: #ede9fe;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --font-sans:
+    "Satoshi", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono:
+    "IBM Plex Mono", "SFMono-Regular", "SF Mono", ui-monospace, Menlo, Monaco, Consolas,
+    monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+* {
+  border-color: var(--border);
+  box-sizing: border-box;
+}
+
+.light {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+body {
+  min-height: 100svh;
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at top left, rgba(87, 80, 241, 0.12), transparent 28rem),
+    linear-gradient(180deg, rgba(107, 114, 255, 0.08) 0%, transparent 18rem),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 36px 36px;
+  content: "";
+  opacity: 0.55;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent 75%);
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input::placeholder {
+  color: var(--muted-foreground);
+}
+
+code {
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--muted);
+  padding: 0.1rem 0.35rem;
+  font-family: "JetBrains Mono", var(--font-mono);
+  font-size: 0.85em;
+}
+
+#root {
+  min-height: 100svh;
+  overflow-x: clip;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+}
