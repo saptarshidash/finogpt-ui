@@ -43,6 +43,7 @@ export default defineConfig(() => {
   const exampleEnv = loadExampleEnv(path.resolve(__dirname, ".env.example"))
 
   return {
+    base: "/finogpt/",
     define: {
       __APP_ENV_DEFAULTS__: JSON.stringify(exampleEnv),
     },
