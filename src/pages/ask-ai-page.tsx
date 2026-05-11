@@ -200,6 +200,10 @@ function isCountLikeKey(key: string) {
   )
 }
 
+function isIdentifierLikeKey(key: string) {
+  return /(^id$|_id$|Id$)/.test(key)
+}
+
 function isPercentLikeKey(key: string) {
   return /(percent|percentage|ratio|share|confidence|rate)/i.test(key)
 }
@@ -254,6 +258,136 @@ function formatValue(value: unknown): string {
   }
 
   return String(value)
+}
+
+function renderMarkdownInline(text: string) {
+  const segments = text.split(/(\*\*[^*]+\*\*|`[^`]+`|\*[^*]+\*)/g).filter(Boolean)
+
+  return segments.map((segment, index) => {
+    if (segment.startsWith("**") && segment.endsWith("**")) {
+      return (
+        <strong key={`${segment}-${index}`} className="font-semibold text-foreground">
+          {segment.slice(2, -2)}
+        </strong>
+      )
+    }
+
+    if (segment.startsWith("`") && segment.endsWith("`")) {
+      return (
+        <code
+          key={`${segment}-${index}`}
+          className="rounded-md border border-border/80 bg-muted/40 px-1.5 py-0.5 text-[0.92em] text-foreground"
+        >
+          {segment.slice(1, -1)}
+        </code>
+      )
+    }
+
+    if (segment.startsWith("*") && segment.endsWith("*")) {
+      return (
+        <em key={`${segment}-${index}`} className="italic text-foreground">
+          {segment.slice(1, -1)}
+        </em>
+      )
+    }
+
+    return <span key={`${segment}-${index}`}>{segment}</span>
+  })
+}
+
+function MarkdownAnswer({ text }: { text: string }) {
+  const lines = text.split(/\r?\n/)
+  const blocks: ReactNode[] = []
+  let index = 0
+
+  while (index < lines.length) {
+    const line = lines[index]
+    const trimmedLine = line.trim()
+
+    if (!trimmedLine) {
+      index += 1
+      continue
+    }
+
+    if (/^\d+\.\s+/.test(trimmedLine)) {
+      const items: string[] = []
+
+      while (index < lines.length && /^\d+\.\s+/.test(lines[index].trim())) {
+        items.push(lines[index].trim().replace(/^\d+\.\s+/, ""))
+        index += 1
+      }
+
+      blocks.push(
+        <ol
+          key={`ordered-${blocks.length}`}
+          className="list-decimal space-y-2 pl-5 text-[15px] leading-7 text-foreground"
+        >
+          {items.map((item, itemIndex) => (
+            <li key={`ordered-item-${itemIndex}`} className="pl-1">
+              {renderMarkdownInline(item)}
+            </li>
+          ))}
+        </ol>,
+      )
+
+      continue
+    }
+
+    if (/^[-*+]\s+/.test(trimmedLine)) {
+      const items: string[] = []
+
+      while (index < lines.length && /^[-*+]\s+/.test(lines[index].trim())) {
+        items.push(lines[index].trim().replace(/^[-*+]\s+/, ""))
+        index += 1
+      }
+
+      blocks.push(
+        <ul
+          key={`unordered-${blocks.length}`}
+          className="list-disc space-y-2 pl-5 text-[15px] leading-7 text-foreground"
+        >
+          {items.map((item, itemIndex) => (
+            <li key={`unordered-item-${itemIndex}`} className="pl-1">
+              {renderMarkdownInline(item)}
+            </li>
+          ))}
+        </ul>,
+      )
+
+      continue
+    }
+
+    const paragraphLines: string[] = []
+
+    while (
+      index < lines.length &&
+      lines[index].trim() &&
+      !/^\d+\.\s+/.test(lines[index].trim()) &&
+      !/^[-*+]\s+/.test(lines[index].trim())
+    ) {
+      paragraphLines.push(lines[index].trim())
+      index += 1
+    }
+
+    blocks.push(
+      <p
+        key={`paragraph-${blocks.length}`}
+        className="text-[15px] leading-7 text-foreground"
+      >
+        {renderMarkdownInline(paragraphLines.join(" "))}
+      </p>,
+    )
+  }
+
+  if (!blocks.length) {
+    return (
+      <p className="text-[15px] leading-7 text-foreground">
+        {renderMarkdownInline(text)}
+      </p>
+    )
+  }
+
+  return <div className="space-y-3">{blocks}</div>
 }
 
 function buildResultColumns(rows: Record<string, unknown>[]) {
@@ -458,6 +592,151 @@ function buildNormalizedKeyMap(rows: Record<string, unknown>[]) {
   return keyMap
 }
 
+function getValueByNormalizedKey(
+  row: Record<string, unknown>,
+  normalizedKey: string,
+) {
+  const actualKey = Object.keys(row).find((key) => normalizeKey(key) === normalizedKey)
+
+  if (!actualKey) {
+    return null
+  }
+
+  return {
+    actualKey,
+    value: row[actualKey],
+  }
+}
+
+function TransactionResultCards({ rows }: { rows: Record<string, unknown>[] }) {
+  return (
+    <div className="space-y-3 md:hidden">
+      {rows.map((row, rowIndex) => {
+        const merchant = getValueByNormalizedKey(row, "entity_name")
+        const amount = getValueByNormalizedKey(row, "amount")
+        const category = getValueByNormalizedKey(row, "category_name")
+        const txnDate = getValueByNormalizedKey(row, "txn_date")
+        const txnTime = getValueByNormalizedKey(row, "txn_time")
+        const txnType = getValueByNormalizedKey(row, "txn_type")
+        const source = getValueByNormalizedKey(row, "source")
+
+        const primaryDetails = [
+          category
+            ? {
+                label: "Category",
+                value: formatTableCell(category.actualKey, category.value),
+              }
+            : null,
+          txnDate
+            ? {
+                label: "Date",
+                value: formatTableCell(txnDate.actualKey, txnDate.value),
+              }
+            : null,
+          txnTime
+            ? {
+                label: "Time",
+                value: formatTableCell(txnTime.actualKey, txnTime.value),
+              }
+            : null,
+          txnType
+            ? {
+                label: "Type",
+                value: formatTableCell(txnType.actualKey, txnType.value),
+              }
+            : null,
+          source
+            ? {
+                label: "Source",
+                value: formatTableCell(source.actualKey, source.value),
+              }
+            : null,
+        ].filter((entry): entry is { label: string; value: string } => Boolean(entry))
+
+        const hiddenKeys = new Set(
+          [
+            merchant?.actualKey,
+            amount?.actualKey,
+            category?.actualKey,
+            txnDate?.actualKey,
+            txnTime?.actualKey,
+            txnType?.actualKey,
+            source?.actualKey,
+          ].filter((value): value is string => Boolean(value)),
+        )
+
+        const extraEntries = Object.entries(row)
+          .filter(
+            ([key, value]) =>
+              !hiddenKeys.has(key) &&
+              !isIdentifierLikeKey(key) &&
+              value !== null &&
+              value !== undefined &&
+              value !== "",
+          )
+          .slice(0, 4)
+
+        return (
+          <div
+            key={rowIndex}
+            className="rounded-2xl border border-border/80 bg-card px-4 py-4 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="break-words text-sm font-semibold text-foreground">
+                  {merchant ? formatTableCell(merchant.actualKey, merchant.value) : `Transaction ${rowIndex + 1}`}
+                </p>
+                {primaryDetails.length ? (
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {primaryDetails
+                      .slice(0, 2)
+                      .map((entry) => entry.value)
+                      .join(" • ")}
+                  </p>
+                ) : null}
+              </div>
+
+              {amount ? (
+                <p className="shrink-0 text-right text-sm font-semibold text-foreground">
+                  {formatTableCell(amount.actualKey, amount.value)}
+                </p>
+              ) : null}
+            </div>
+
+            {primaryDetails.length > 2 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {primaryDetails.slice(2).map((entry) => (
+                  <span
+                    key={entry.label}
+                    className="rounded-full border border-border/80 bg-muted/30 px-2.5 py-1 text-[11px] font-medium text-muted-foreground"
+                  >
+                    {entry.label}: {entry.value}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            {extraEntries.length ? (
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                {extraEntries.map(([key, value]) => (
+                  <div key={key} className="space-y-1">
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      {formatLabel(key)}
+                    </dt>
+                    <dd className="break-words text-sm text-foreground">
+                      {formatTableCell(key, value)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function TransactionResultTable({ rows }: { rows: Record<string, unknown>[] }) {
   const keyMap = useMemo(() => buildNormalizedKeyMap(rows), [rows])
 
@@ -552,6 +831,65 @@ function TransactionResultTable({ rows }: { rows: Record<string, unknown>[] }) {
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+function GenericResultCards({ rows }: { rows: Record<string, unknown>[] }) {
+  return (
+    <div className="space-y-3 md:hidden">
+      {rows.map((row, rowIndex) => {
+        const entries = Object.entries(row).filter(([, value]) => value !== null && value !== undefined && value !== "")
+        const preferredTitleEntry =
+          entries.find(
+            ([key]) =>
+              !isIdentifierLikeKey(key) && /(name|label|merchant|entity|category)/i.test(key),
+          ) ??
+          entries.find(
+            ([key]) => !isIdentifierLikeKey(key) && /(date|period|month|year)/i.test(key),
+          ) ??
+          entries.find(([key]) => !isIdentifierLikeKey(key)) ??
+          entries[0]
+        const titleKey = preferredTitleEntry?.[0] ?? null
+        const titleValue = preferredTitleEntry ? formatTableCell(preferredTitleEntry[0], preferredTitleEntry[1]) : `Row ${rowIndex + 1}`
+        const remainingEntries = entries
+          .filter(([key]) => key !== titleKey && !isIdentifierLikeKey(key))
+          .slice(0, 6)
+
+        return (
+          <div
+            key={rowIndex}
+            className="rounded-2xl border border-border/80 bg-card px-4 py-4 shadow-sm"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="break-words text-sm font-semibold text-foreground">{titleValue}</p>
+              </div>
+            </div>
+
+            {remainingEntries.length ? (
+              <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+                {remainingEntries.map(([key, value]) => (
+                  <div key={key} className="space-y-1">
+                    <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      {formatLabel(key)}
+                    </dt>
+                    <dd
+                      className={cn(
+                        "break-words text-sm text-foreground",
+                        isCurrencyLikeKey(key) && "font-medium tabular-nums",
+                        /id$/i.test(key) && "font-mono text-xs text-muted-foreground",
+                      )}
+                    >
+                      {formatTableCell(key, value)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            ) : null}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -676,14 +1014,28 @@ function RenderedResultView({ response }: { response: QueryResponse }) {
   }
 
   if (looksTransactionLikeRows(response.data, response.metadata)) {
-    return <TransactionResultTable rows={response.data} />
+    return (
+      <>
+        <TransactionResultCards rows={response.data} />
+        <div className="hidden md:block">
+          <TransactionResultTable rows={response.data} />
+        </div>
+      </>
+    )
   }
 
   if (response.data.length === 1 && Object.keys(response.data[0]).length <= 6) {
     return <AggregateSummaryGrid row={response.data[0]} />
   }
 
-  return <GenericResultTable rows={response.data} />
+  return (
+    <>
+      <GenericResultCards rows={response.data} />
+      <div className="hidden md:block">
+        <GenericResultTable rows={response.data} />
+      </div>
+    </>
+  )
 }
 
 function RawResultView({ response }: { response: QueryResponse }) {
@@ -779,24 +1131,36 @@ function ResponseMetaBadges({
   rowsCount: number
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Badge className="gap-1.5">
-        <Sparkles className="size-3.5" />
-        {isHistory ? "Saved answer" : "AI answer"}
-      </Badge>
-      <span
-        className={cn(
-          "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium",
-          getActionTone(action),
-        )}
-      >
-        {getActionLabel(action)}
-      </span>
-      {queryType ? <Badge variant="outline">{formatLabel(queryType)}</Badge> : null}
-      <Badge variant="outline">
-        {rowsCount.toLocaleString("en-IN")} {rowsCount === 1 ? "row" : "rows"}
-      </Badge>
-      {exactRange ? <Badge variant="outline">{exactRange}</Badge> : null}
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge className="gap-1.5">
+          <Sparkles className="size-3.5" />
+          {isHistory ? "Saved answer" : "AI answer"}
+        </Badge>
+        <span
+          className={cn(
+            "inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium",
+            getActionTone(action),
+          )}
+        >
+          {getActionLabel(action)}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 md:hidden">
+        {queryType ? <Badge variant="outline">{formatLabel(queryType)}</Badge> : null}
+        <Badge variant="outline">
+          {rowsCount.toLocaleString("en-IN")} {rowsCount === 1 ? "row" : "rows"}
+        </Badge>
+      </div>
+
+      <div className="hidden flex-wrap items-center gap-2 md:flex">
+        {queryType ? <Badge variant="outline">{formatLabel(queryType)}</Badge> : null}
+        <Badge variant="outline">
+          {rowsCount.toLocaleString("en-IN")} {rowsCount === 1 ? "row" : "rows"}
+        </Badge>
+        {exactRange ? <Badge variant="outline">{exactRange}</Badge> : null}
+      </div>
     </div>
   )
 }
@@ -874,7 +1238,7 @@ function ClarificationPanel({
                         isSelected && "border-primary bg-accent/40",
                       )}
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex min-w-0 items-start gap-3">
                           <span
                             className={cn(
@@ -890,7 +1254,11 @@ function ClarificationPanel({
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline">{formatConfidence(option.score)}</Badge>
+                        <div className="hidden justify-start sm:flex sm:justify-end">
+                          <Badge variant="outline" className="shrink-0">
+                            {formatConfidence(option.score)}
+                          </Badge>
+                        </div>
                       </div>
                     </button>
                   )
@@ -1033,12 +1401,12 @@ function AssistantAnswerCard({
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             Answer
           </p>
-          <p className="whitespace-pre-wrap text-[15px] leading-7 text-foreground">
-            {visibleAnswer}
+          <div>
+            <MarkdownAnswer text={visibleAnswer} />
             {isStreaming ? (
               <span className="ml-0.5 inline-block h-4 w-2 translate-y-0.5 animate-pulse rounded-sm bg-primary" />
             ) : null}
-          </p>
+          </div>
         </div>
 
         {hasClarification ? (
@@ -1055,15 +1423,21 @@ function AssistantAnswerCard({
 
         {!isStreaming ? (
           <div className="space-y-4">
-            <ResultTabs activeTab={activeTab} onChange={setActiveTab} />
-
-            {activeTab === "rendered" ? (
+            <div className="md:hidden">
               <RenderedResultView response={response} />
-            ) : activeTab === "raw" ? (
-              <RawResultView response={response} />
-            ) : (
-              <DebugResultView response={response} />
-            )}
+            </div>
+
+            <div className="hidden space-y-4 md:block">
+              <ResultTabs activeTab={activeTab} onChange={setActiveTab} />
+
+              {activeTab === "rendered" ? (
+                <RenderedResultView response={response} />
+              ) : activeTab === "raw" ? (
+                <RawResultView response={response} />
+              ) : (
+                <DebugResultView response={response} />
+              )}
+            </div>
           </div>
         ) : null}
       </div>
@@ -1758,7 +2132,7 @@ export function AskAiPage() {
           <div className="space-y-1">
             <h1 className="text-2xl font-semibold text-foreground">AI chat workspace</h1>
             <p className="max-w-3xl text-sm text-muted-foreground">
-              Ask finance questions in plain language, resolve ambiguities inside the conversation, reopen saved answers from history, and inspect raw/debug output when needed.
+              Ask finance questions in plain language, resolve ambiguities inside the conversation, and reopen saved answers from history.
             </p>
           </div>
         </div>
@@ -1799,7 +2173,12 @@ export function AskAiPage() {
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Clarification stays inline in the thread. Raw and debug views stay attached to each assistant answer.
+                  <span className="md:hidden">
+                    Clarification stays inline and results are formatted for conversation-first review.
+                  </span>
+                  <span className="hidden md:inline">
+                    Clarification stays inline in the thread. Raw and debug views stay attached to each assistant answer.
+                  </span>
                 </p>
               </div>
 
@@ -1832,7 +2211,7 @@ export function AskAiPage() {
                     Ask about spend, merchants, categories, or trends
                   </h2>
                   <p className="max-w-2xl text-sm text-muted-foreground">
-                    The assistant can execute analytics-style queries, return transaction lists, ask for merchant/category clarification, and expose raw/debug output for inspection.
+                    The assistant can execute analytics-style queries, return transaction lists, and ask for merchant or category clarification inside the thread.
                   </p>
                 </div>
 
@@ -1918,7 +2297,12 @@ export function AskAiPage() {
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-xs text-muted-foreground">
-                  Structured results, raw result payloads, and query debug metadata stay attached to each assistant answer.
+                  <span className="md:hidden">
+                    Results are rendered as chat-friendly summaries and cards on mobile.
+                  </span>
+                  <span className="hidden md:inline">
+                    Structured results, raw result payloads, and query debug metadata stay attached to each assistant answer.
+                  </span>
                 </p>
 
                 <div className="flex items-center gap-2">
