@@ -65,8 +65,8 @@ export function SignupPage() {
   return (
     <AuthShell
       title="Create account"
-      description="Set up access to your financial workspace."
-      desktopDescription="Create an account to upload statements, review transactions, and work through financial insights in one place."
+      description="Set up access to an AI-assisted finance intelligence workspace."
+      desktopDescription="Create an account to upload statements, structure transaction data, and explore deterministic analytics with AI-assisted investigation in one place."
       footer={
         <p>
           Already have an account?{" "}

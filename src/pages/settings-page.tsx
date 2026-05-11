@@ -213,8 +213,8 @@ function DeleteDataModal({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-md border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-            <p className="font-medium text-red-300">This action cannot be undone.</p>
+          <div className="rounded-md border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-200">
+            <p className="font-medium text-red-800 dark:text-red-100">This action cannot be undone.</p>
             <p className="mt-1">
               Transactions, uploads, mappings, saved query history, and account access are removed immediately after confirmation.
             </p>
@@ -716,14 +716,14 @@ export function SettingsPage() {
 
             <Card className="border-red-500/20">
               <CardHeader>
-                <CardTitle className="text-red-400">Danger zone</CardTitle>
+              <CardTitle className="text-red-700 dark:text-red-400">Danger zone</CardTitle>
                 <CardDescription>
                   Permanently remove the account and all user-owned data from the workspace.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="rounded-md border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                  <p className="font-medium text-red-300">This action is irreversible.</p>
+                <div className="rounded-md border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-200">
+                  <p className="font-medium text-red-800 dark:text-red-100">This action is irreversible.</p>
                   <p className="mt-1">
                     Deleting this account removes statement uploads, transactions, mappings, query history, and session access.
                   </p>

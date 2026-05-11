@@ -52,8 +52,8 @@ export function LoginPage() {
   return (
     <AuthShell
       title="Sign in"
-      description="Track spending, transactions, and insights."
-      desktopDescription="Track spending, review transactions, and explore financial insights in one workspace."
+      description="Resume your AI-assisted finance workspace and investigation flow."
+      desktopDescription="Sign in to review structured transactions, merchant intelligence, recurring signals, and natural-language finance exploration in one workspace."
       footer={
         <p>
           New to Finogpt?{" "}

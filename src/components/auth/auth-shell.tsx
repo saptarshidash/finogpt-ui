@@ -207,6 +207,30 @@ export function AuthShell({
   footer,
   title,
 }: AuthShellProps) {
+  const recruiterBadges = [
+    {
+      label: "AI Finance Q&A",
+      mobileClassName:
+        "border-violet-300/70 bg-violet-500/12 text-violet-700 shadow-[0_0_22px_rgba(139,92,246,0.18)] dark:border-violet-400/30 dark:bg-violet-400/12 dark:text-violet-200",
+      desktopClassName:
+        "border-violet-300/70 bg-violet-500/10 text-violet-700 dark:border-violet-400/28 dark:bg-violet-400/12 dark:text-violet-200",
+    },
+    {
+      label: "Anomaly Signals",
+      mobileClassName:
+        "border-amber-300/75 bg-amber-400/14 text-amber-800 shadow-[0_0_22px_rgba(245,158,11,0.16)] dark:border-amber-400/30 dark:bg-amber-400/12 dark:text-amber-200",
+      desktopClassName:
+        "border-amber-300/75 bg-amber-400/12 text-amber-800 dark:border-amber-400/28 dark:bg-amber-400/12 dark:text-amber-200",
+    },
+    {
+      label: "Spend Analytics",
+      mobileClassName:
+        "border-emerald-300/75 bg-emerald-500/12 text-emerald-800 shadow-[0_0_22px_rgba(16,185,129,0.16)] dark:border-emerald-400/30 dark:bg-emerald-400/12 dark:text-emerald-200",
+      desktopClassName:
+        "border-emerald-300/75 bg-emerald-500/10 text-emerald-800 dark:border-emerald-400/28 dark:bg-emerald-400/12 dark:text-emerald-200",
+    },
+  ]
+
   return (
     <div className="relative flex min-h-svh items-center overflow-hidden px-4 py-6 sm:px-6 lg:px-8">
       <div className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6 lg:right-8">
@@ -222,11 +246,22 @@ export function AuthShell({
               </div>
               <div className="space-y-4">
                 <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-foreground xl:text-5xl">
-                  Statements, UPI activity, and finance investigation in one calm workspace.
+                  AI-assisted finance investigation for statements, UPI activity, and transaction intelligence.
                 </h1>
                 <p className="max-w-2xl text-base leading-7 text-muted-foreground">
                   {desktopDescription}
                 </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                {recruiterBadges.map((badge) => (
+                  <span
+                    key={badge.label}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium ${badge.desktopClassName}`}
+                  >
+                    {badge.label}
+                  </span>
+                ))}
               </div>
 
               <div className="grid gap-3 xl:grid-cols-3">
@@ -234,17 +269,17 @@ export function AuthShell({
                   {
                     icon: Workflow,
                     label: "Ingestion",
-                    value: "Track uploads and parse progress.",
+                    value: "Track uploads, parsing status, and structured extraction.",
                   },
                   {
                     icon: Sparkles,
-                    label: "Analysis",
-                    value: "Switch between charts, rows, and NLQ.",
+                    label: "AI analysis",
+                    value: "Move between charts, rows, and natural-language exploration.",
                   },
                   {
                     icon: ShieldCheck,
-                    label: "Control",
-                    value: "Stay inside authenticated user sessions.",
+                    label: "Signals",
+                    value: "Review recurring patterns, anomaly cues, and merchant-level insight.",
                   },
                 ].map((item) => (
                   <div
@@ -275,6 +310,16 @@ export function AuthShell({
 
               <div className="lg:hidden">
                 <AuthWorkspaceIllustration compact />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {recruiterBadges.map((badge) => (
+                    <span
+                      key={badge.label}
+                      className={`rounded-full border px-3 py-1 text-xs font-medium ${badge.mobileClassName}`}
+                    >
+                      {badge.label}
+                    </span>
+                  ))}
+                </div>
               </div>
 
               <div className="flex items-start gap-3">
