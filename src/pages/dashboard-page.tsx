@@ -193,7 +193,7 @@ function BreakdownList({
                 {item.txnCount.toLocaleString("en-IN")} transactions
               </p>
             </div>
-            <div className="text-right">
+            <div className="w-full shrink-0 text-left sm:w-auto sm:text-right">
               <p className="text-sm font-semibold text-foreground">
                 {formatCompactCurrency(item.totalAmount)}
               </p>
@@ -206,7 +206,7 @@ function BreakdownList({
           return (
             <div
               key={item.id}
-              className="flex items-center justify-between gap-4 rounded-md border border-border bg-muted/40 px-3 py-3"
+              className="flex flex-col gap-2 rounded-md border border-border bg-muted/40 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
             >
               {content}
             </div>
@@ -217,7 +217,7 @@ function BreakdownList({
           <Link
             key={item.id}
             to={getHref(item)}
-            className="flex items-center justify-between gap-4 rounded-md border border-border bg-muted/40 px-3 py-3 transition-colors hover:bg-accent/60"
+            className="flex flex-col gap-2 rounded-md border border-border bg-muted/40 px-3 py-3 transition-colors hover:bg-accent/60 sm:flex-row sm:items-center sm:justify-between"
           >
             {content}
           </Link>
@@ -334,7 +334,7 @@ function RecurringList({
       {items.map((item) => (
         <div
           key={item.id}
-          className="flex items-start justify-between gap-4 rounded-md border border-border bg-muted/40 px-3 py-3"
+          className="flex flex-col gap-3 rounded-md border border-border bg-muted/40 px-3 py-3 sm:flex-row sm:items-start sm:justify-between"
         >
           <div className="min-w-0 space-y-1">
             <p className="truncate text-sm font-medium text-foreground">
@@ -352,7 +352,7 @@ function RecurringList({
                   : "Date unavailable"}
             </p>
           </div>
-          <div className="text-right">
+          <div className="w-full shrink-0 text-left sm:w-auto sm:text-right">
             <p className="text-sm font-semibold text-foreground">
               {item.avgAmount !== null ? formatCompactCurrency(item.avgAmount) : "—"}
             </p>
@@ -590,8 +590,8 @@ export function DashboardPage() {
         </Card>
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr_0.9fr]">
-        <Card>
+      <section className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.9fr)]">
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Daily cashflow</CardTitle>
             <CardDescription>Credit and debit totals for the recent 30-day window.</CardDescription>
@@ -604,7 +604,7 @@ export function DashboardPage() {
               emptyMessage="No cashflow data is available for the selected range yet."
               errorMessage="Unable to load cashflow data right now."
             >
-              <div className="h-72 w-full">
+              <div className="h-72 min-w-0 w-full overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={cashflowDailyQuery.data}
@@ -616,6 +616,8 @@ export function DashboardPage() {
                       tick={{ fill: "#a1a1aa", fontSize: 12 }}
                       tickLine={false}
                       axisLine={false}
+                      minTickGap={16}
+                      padding={{ left: 8, right: 8 }}
                     />
                     <YAxis
                       tick={{ fill: "#a1a1aa", fontSize: 12 }}
@@ -633,7 +635,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Top merchants</CardTitle>
             <CardDescription>{getBreakdownDescription(period)}</CardDescription>
@@ -650,7 +652,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Top categories</CardTitle>
             <CardDescription>{getCategoryDescription(period)}</CardDescription>
@@ -668,8 +670,8 @@ export function DashboardPage() {
         </Card>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <Card>
+      <section className="grid min-w-0 gap-4 md:grid-cols-2">
+        <Card className="min-w-0">
           <CardHeader className="space-y-2">
             <CardTitle className="text-base leading-6">Recurring summary</CardTitle>
             <CardDescription className="max-w-[32rem] leading-6">
@@ -716,7 +718,7 @@ export function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Overview window</CardTitle>
             <CardDescription>Selected overview period and how it maps across the dashboard.</CardDescription>
@@ -737,7 +739,7 @@ export function DashboardPage() {
                   <p className="text-xs uppercase tracking-[0.14em] text-primary">
                     {getPeriodLabel(period)}
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-foreground">
+                  <p className="mt-2 break-words text-lg font-semibold text-foreground">
                     {formatDate(overview.startDate)} to {formatDate(overview.endDate)}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">

@@ -249,7 +249,7 @@ export function AnalyticsPage() {
   const breakdownItems = breakdownQuery.data?.items ?? []
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6 overflow-x-clip">
       <div className="space-y-2">
         <Badge>Analytics explorer</Badge>
         <div className="space-y-1">
@@ -389,8 +389,8 @@ export function AnalyticsPage() {
         </CardContent>
       </Card>
 
-      <section className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
-        <Card>
+      <section className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Summary series</CardTitle>
             <CardDescription>
@@ -411,7 +411,7 @@ export function AnalyticsPage() {
                 No analytics summary data is available for this range yet.
               </div>
             ) : (
-              <div className="h-80 w-full">
+              <div className="h-80 min-w-0 w-full overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={seriesData} margin={{ top: 12, right: 8, left: 0, bottom: 0 }}>
                     <defs>
@@ -421,7 +421,14 @@ export function AnalyticsPage() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid stroke="rgba(148,163,184,0.18)" vertical={false} />
-                    <XAxis dataKey="label" tick={{ fill: "#71717a", fontSize: 12 }} tickLine={false} axisLine={false} />
+                    <XAxis
+                      dataKey="label"
+                      tick={{ fill: "#71717a", fontSize: 12 }}
+                      tickLine={false}
+                      axisLine={false}
+                      minTickGap={16}
+                      padding={{ left: 8, right: 8 }}
+                    />
                     <YAxis
                       tick={{ fill: "#71717a", fontSize: 12 }}
                       tickLine={false}
@@ -441,7 +448,7 @@ export function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>Explorer breakdown</CardTitle>
             <CardDescription>
@@ -466,14 +473,14 @@ export function AnalyticsPage() {
             ) : (
               breakdownItems.map((item, index) => (
                 <div key={item.id} className="rounded-lg border border-border bg-muted/40 px-4 py-3">
-                  <div className="flex items-center justify-between gap-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-foreground">{item.name}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {item.txnCount.toLocaleString("en-IN")} transactions
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="w-full shrink-0 text-left sm:w-auto sm:text-right">
                       <p className="text-sm font-semibold text-foreground">
                         {sort === "count"
                           ? item.txnCount.toLocaleString("en-IN")
