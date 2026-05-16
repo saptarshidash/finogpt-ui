@@ -20,92 +20,89 @@ import { SettingsPage } from "@/pages/settings-page"
 import { SignupPage } from "@/pages/signup-page"
 import { TransactionsPage } from "@/pages/transactions-page"
 
-export const appRouter = createBrowserRouter(
-  [
-    {
-      element: <PublicOnlyRoute />,
-      children: [
-        {
-          path: "/login",
-          element: <LoginPage />,
-        },
-        {
-          path: "/signup",
-          element: <SignupPage />,
-        },
-      ],
-    },
-    {
-      path: "/",
-      element: <ProtectedRoute />,
-      children: [
-        {
-          element: <AppShell />,
-          children: [
-            {
-              index: true,
-              element: <Navigate to="/dashboard" replace />,
-            },
-            {
-              path: "dashboard",
-              element: <DashboardPage />,
-            },
-            {
-              path: "ingestion",
-              element: <IngestionPage />,
-            },
-            {
-              path: "ingestion/:jobId",
-              element: <IngestionJobPage />,
-            },
-            {
-              path: "transactions",
-              element: <TransactionsPage />,
-            },
-            {
-              path: "analytics",
-              element: <AnalyticsPage />,
-            },
-            {
-              path: "entities",
-              element: <EntitySummaryPage />,
-            },
-            {
-              path: "entities/:entityId",
-              element: <EntityDetailPage />,
-            },
-            {
-              path: "categories",
-              element: <CategorySummaryPage />,
-            },
-            {
-              path: "categories/:categoryId",
-              element: <CategoryDetailPage />,
-            },
-            {
-              path: "alerts",
-              element: <AlertsPage />,
-            },
-            {
-              path: "recurring",
-              element: <RecurringPage />,
-            },
-            {
-              path: "ask-ai",
-              element: <AskAiPage />,
-            },
-            {
-              path: "settings",
-              element: <SettingsPage />,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      path: "*",
-      element: <Navigate to="/dashboard" replace />,
-    },
-  ],
-  { basename: "/finogpt" },
-)
+export const appRouter = createBrowserRouter([
+  {
+    element: <PublicOnlyRoute />,
+    children: [
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
+        path: "/signup",
+        element: <SignupPage />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/dashboard" replace />,
+          },
+          {
+            path: "dashboard",
+            element: <DashboardPage />,
+          },
+          {
+            path: "ingestion",
+            element: <IngestionPage />,
+          },
+          {
+            path: "ingestion/:jobId",
+            element: <IngestionJobPage />,
+          },
+          {
+            path: "transactions",
+            element: <TransactionsPage />,
+          },
+          {
+            path: "analytics",
+            element: <AnalyticsPage />,
+          },
+          {
+            path: "entities",
+            element: <EntitySummaryPage />,
+          },
+          {
+            path: "entities/:entityId",
+            element: <EntityDetailPage />,
+          },
+          {
+            path: "categories",
+            element: <CategorySummaryPage />,
+          },
+          {
+            path: "categories/:categoryId",
+            element: <CategoryDetailPage />,
+          },
+          {
+            path: "alerts",
+            element: <AlertsPage />,
+          },
+          {
+            path: "recurring",
+            element: <RecurringPage />,
+          },
+          {
+            path: "ask-ai",
+            element: <AskAiPage />,
+          },
+          {
+            path: "settings",
+            element: <SettingsPage />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <Navigate to="/dashboard" replace />,
+  },
+])
